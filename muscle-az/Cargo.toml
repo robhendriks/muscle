@@ -1,0 +1,10 @@
+[package]
+name = "muscle-az"
+description = "Azure lib"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+documentation.workspace = true
+
+[dependencies]
+log = { workspace = true }

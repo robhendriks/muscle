@@ -1,0 +1,19 @@
+[package]
+name = "muscle"
+description = "Bicep monorepo manager"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+documentation.workspace = true
+
+[dependencies]
+anyhow = { workspace = true }
+clap = { version = "4.5.57", features = ["derive", "env"] }
+env_logger = "0.11.8"
+tokio = { workspace = true, features = ["full"] }
+log = { workspace = true }
+serde = { workspace = true, features = ["derive"] }
+serde_json = { workspace = true }
+muscle-core = { path = "../muscle-core" }
+muscle-az = { path = "../muscle-az" }
+glob = "0.3.3"
