@@ -37,7 +37,7 @@ impl ModuleArgs {
                         description: args.description.to_string(),
                         authors: vec![args.author.to_string()],
                         version: args.version.to_string(),
-                        main: args.main.to_string(),
+                        main: String::from("main.bicep"),
                         tags: vec![],
                     },
                 );
@@ -96,9 +96,6 @@ struct InitArgs {
 
     #[arg(short, long, default_value = "0.1.0")]
     version: String,
-
-    #[arg(short, long, default_value = "main.bicep")]
-    main: String,
 }
 
 #[derive(Debug, Args)]
