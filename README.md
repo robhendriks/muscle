@@ -17,7 +17,7 @@ cargo install muscle
 Initialize a new Bicep monorepo:
 
 ```bash
-muscle init --author "Your Name" --version 0.1.0
+muscle init
 ```
 
 List all modules:
