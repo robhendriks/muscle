@@ -27,6 +27,18 @@ impl ModuleArgs {
         project.discover_modules().await?;
 
         match &self.command {
+            ModuleCommands::Build(args) => {
+                let module = project.find_module(&args.name);
+
+                match module {
+                    Some(module) => {
+                        let main_file = module.main_file();
+                        log::info!("[BUILD] {}", main_file.display());
+                        Ok(())
+                    }
+                    None => Err(anyhow!("Module '{}' not found", args.name)),
+                }
+            }
             ModuleCommands::Init(args) => {
                 let cfg_path = ModuleCfg::get_path(&args.path);
                 let cfg_container = JsonContainer::from(
@@ -69,13 +81,19 @@ impl ModuleArgs {
 
 #[derive(Debug, Subcommand)]
 enum ModuleCommands {
+    #[command(alias = "b")]
+    Build(BuildArgs),
     #[command(alias = "i")]
     Init(InitArgs),
-
     #[command(alias = "s")]
     Show(ShowArgs),
     #[command(alias = "ls")]
     List(ListArgs),
+}
+
+#[derive(Debug, Args)]
+struct BuildArgs {
+    name: String,
 }
 
 #[derive(Debug, Args)]

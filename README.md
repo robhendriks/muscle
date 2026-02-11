@@ -2,6 +2,9 @@
 
 A lightweight CLI for managing Bicep monorepos.
 
+> [!IMPORTANT]
+> Requires a local installation of [Azure CLI](https://learn.microsoft.com/en-us/azure/azure-resource-manager/bicep/install#azure-cli) and [Bicep](https://learn.microsoft.com/en-us/azure/azure-resource-manager/bicep/install).
+
 ## What it does
 
 Muscle helps you organize, build, and publish Bicep modules in a monorepo structure.

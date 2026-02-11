@@ -1,4 +1,7 @@
-use std::path::{Path, PathBuf};
+use std::{
+    cell::OnceCell,
+    path::{Path, PathBuf},
+};
 
 use glob::glob;
 use serde::Serialize;
@@ -63,6 +66,7 @@ impl Project {
 pub struct Module {
     pub path: PathBuf,
     pub cfg: JsonContainer<ModuleCfg>,
+    main: OnceCell<PathBuf>,
 }
 
 impl Module {
@@ -70,6 +74,7 @@ impl Module {
         Self {
             path: path.as_ref().to_path_buf(),
             cfg: JsonContainer::new(ModuleCfg::get_path(path)),
+            main: OnceCell::new(),
         }
     }
 
@@ -90,6 +95,13 @@ impl Module {
             tags: &cfg.tags,
             path,
         }
+    }
+
+    pub fn main_file(&self) -> &Path {
+        self.main.get_or_init(|| {
+            let main_file = &self.get_cfg().main;
+            self.path.join(main_file)
+        })
     }
 
     fn get_cfg(&self) -> &ModuleCfg {
