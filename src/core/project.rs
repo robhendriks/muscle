@@ -14,7 +14,7 @@ pub struct ProjectJson {
 
 impl ProjectJson {
     pub fn get_path(path: impl AsRef<Path>) -> PathBuf {
-        static FILE: &'static str = "muscle.json";
+        static FILE: &str = "muscle.json";
         path.as_ref().join(FILE)
     }
 }

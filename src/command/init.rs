@@ -29,8 +29,8 @@ pub struct InitArgs {
 
 impl InitArgs {
     pub async fn execute(&self, cli: &Cli) -> anyhow::Result<()> {
-        init_project(&cli.root, &self).await?;
-        init_modules(&cli.root, &self).await
+        init_project(&cli.root, self).await?;
+        init_modules(&cli.root, self).await
     }
 }
 
@@ -53,7 +53,7 @@ async fn init_modules(root: &Path, args: &InitArgs) -> anyhow::Result<()> {
     let pattern = root.join(&args.glob);
     let pattern_str = pattern.to_str().unwrap();
 
-    let glob = util::Glob::new(&pattern_str);
+    let glob = util::Glob::new(pattern_str);
     let glob_matches = glob.matches()?;
 
     for glob_match in glob_matches {
@@ -71,7 +71,7 @@ async fn init_modules(root: &Path, args: &InitArgs) -> anyhow::Result<()> {
 
         let (name, tags) = get_name_and_tags(&components);
 
-        let json_path = ModuleJson::get_path(&module_dir);
+        let json_path = ModuleJson::get_path(module_dir);
         let json_c = JsonContainer::from(
             &json_path,
             ModuleJson {
@@ -93,7 +93,7 @@ async fn init_modules(root: &Path, args: &InitArgs) -> anyhow::Result<()> {
     Ok(())
 }
 
-fn get_name_and_tags(components: &Vec<String>) -> (String, Vec<String>) {
+fn get_name_and_tags(components: &[String]) -> (String, Vec<String>) {
     let name: String = components
         .last()
         .map_or_else(|| String::from(""), |s| s.to_owned());

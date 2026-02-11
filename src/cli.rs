@@ -16,7 +16,7 @@ pub struct Cli {
 impl Cli {
     pub async fn execute(&self) -> anyhow::Result<()> {
         match &self.command {
-            Commands::Init(args) => args.execute(&self).await,
+            Commands::Init(args) => args.execute(self).await,
         }
     }
 }

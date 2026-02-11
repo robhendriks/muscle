@@ -20,7 +20,7 @@ pub struct ModuleJson {
 
 impl ModuleJson {
     pub fn get_path(path: impl AsRef<Path>) -> PathBuf {
-        static FILE: &'static str = "module.json";
+        static FILE: &str = "module.json";
         path.as_ref().join(FILE)
     }
 }

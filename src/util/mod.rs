@@ -21,10 +21,8 @@ impl Glob {
     pub fn matches<'gl>(&'gl self) -> anyhow::Result<Vec<GlobMatch<'gl>>> {
         let mut matches: Vec<GlobMatch<'gl>> = Vec::new();
 
-        for entry in glob::glob(&self.pattern)? {
-            if let Ok(path) = entry {
-                matches.push(GlobMatch { glob: &self, path });
-            }
+        for path in glob::glob(&self.pattern)?.flatten() {
+            matches.push(GlobMatch { glob: self, path });
         }
 
         Ok(matches)
@@ -54,11 +52,11 @@ impl<'gl> GlobMatch<'gl> {
     }
 
     pub fn components(&'gl self) -> Option<Vec<String>> {
-        let captures = self.glob.get_regex().captures(&self.path.to_str()?)?;
+        let captures = self.glob.get_regex().captures(self.path.to_str()?)?;
         let components: Vec<String> = captures
             .iter()
             .skip(1)
-            .filter_map(|m| m)
+            .flatten()
             .flat_map(|m| m.as_str().split('/'))
             .map(|s| s.to_string())
             .collect();
