@@ -1,6 +1,7 @@
 use std::path::{Path, PathBuf};
 
 use crate::cli::Cli;
+use crate::util::wildcard::extract_wildcard_components;
 use clap::Args;
 use muscle_core::{json::JsonContainer, module, module::ModuleJson, project, project::ProjectJson};
 
@@ -49,17 +50,22 @@ async fn init_modules(root: &Path, args: &InitArgs) -> anyhow::Result<()> {
 
     for (module_path, module_main) in module_paths {
         let module_main_file_name = module_main.file_name().unwrap();
+        let module_main_relative = module_main.strip_prefix(&root)?;
+
+        let (name, tags) = get_name_and_tags(&args.glob, module_main_relative)
+            .unwrap_or_else(|| (String::from(""), Vec::new()));
 
         let json_path = ModuleJson::get_path(&module_path);
         let json_c = JsonContainer::from(
             &json_path,
             ModuleJson {
                 schema: module::SCHEMA_URL.to_string(),
-                name: String::from(""),
+                name,
                 description: String::from(""),
                 authors: vec![args.author.to_string()],
                 version: args.version.to_string(),
                 main: String::from(module_main_file_name.to_str().unwrap()),
+                tags,
             },
         );
 
@@ -69,6 +75,24 @@ async fn init_modules(root: &Path, args: &InitArgs) -> anyhow::Result<()> {
     }
 
     Ok(())
+}
+
+fn get_name_and_tags(glob: &str, path: &Path) -> Option<(String, Vec<String>)> {
+    let path = path.to_str().unwrap();
+    let components = extract_wildcard_components(glob, path)?;
+
+    let name: String = components
+        .last()
+        .map_or_else(|| String::from(""), |s| s.to_owned());
+
+    let categories: Vec<String> = components
+        .iter()
+        .rev()
+        .skip(1)
+        .map(|s| s.to_string())
+        .collect();
+
+    Some((name, categories))
 }
 
 fn discover_modules(pattern: &str) -> anyhow::Result<Vec<(PathBuf, PathBuf)>> {

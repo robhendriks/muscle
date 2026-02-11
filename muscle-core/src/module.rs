@@ -15,6 +15,7 @@ pub struct ModuleJson {
     pub authors: Vec<String>,
     pub version: String,
     pub main: String,
+    pub tags: Vec<String>,
 }
 
 impl ModuleJson {

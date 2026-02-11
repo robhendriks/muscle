@@ -259,10 +259,8 @@ dependencies = [
  "env_logger",
  "glob",
  "log",
- "muscle-az",
  "muscle-core",
- "serde",
- "serde_json",
+ "regex",
  "tokio",
 ]
 

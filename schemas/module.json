@@ -15,7 +15,8 @@
       "items": {
         "type": "string"
       },
-      "minItems": 1
+      "minItems": 1,
+      "uniqueItems": true
     },
     "version": {
       "type": "string",
@@ -24,6 +25,13 @@
     "main": {
       "type": "string",
       "pattern": ".bicep$"
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "uniqueItems": true
     }
   },
   "required": [
