@@ -1,15 +1,20 @@
-use std::path::{Path, PathBuf};
+use std::{
+    cell::OnceCell,
+    path::{Path, PathBuf},
+};
 
 use regex::Regex;
 
 pub struct Glob {
     pattern: String,
+    regex: OnceCell<Regex>,
 }
 
 impl Glob {
     pub fn new(pattern: &str) -> Self {
         Self {
             pattern: pattern.to_string(),
+            regex: OnceCell::new(),
         }
     }
 
@@ -23,6 +28,13 @@ impl Glob {
         }
 
         Ok(matches)
+    }
+
+    fn get_regex(&self) -> &Regex {
+        self.regex.get_or_init(|| {
+            let regex_pattern = format!("^{}$", self.pattern.replace("**", "(.+?)"));
+            Regex::new(&regex_pattern).unwrap()
+        })
     }
 }
 
@@ -41,12 +53,7 @@ impl<'gl> GlobMatch<'gl> {
     }
 
     pub fn components(&'gl self) -> Option<Vec<String>> {
-        let pattern = &self.glob.pattern;
-
-        let regex_pattern = format!("^{}$", pattern.replace("**", "(.+?)"));
-        let re = Regex::new(&regex_pattern).ok()?;
-
-        let captures = re.captures(&self.path.to_str()?)?;
+        let captures = self.glob.get_regex().captures(&self.path.to_str()?)?;
         let components: Vec<String> = captures
             .iter()
             .skip(1)

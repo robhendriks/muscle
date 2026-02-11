@@ -50,10 +50,18 @@ async fn init_modules(root: &Path, args: &InitArgs) -> anyhow::Result<()> {
     let glob_matches = glob.matches()?;
 
     for glob_match in glob_matches {
-        let module_dir = glob_match.parent().with_context(|| "")?;
-        let module_main = glob_match.file_name_str().with_context(|| "")?;
+        let module_dir = glob_match
+            .parent()
+            .with_context(|| "Failed to resolve module directory")?;
 
-        let components = glob_match.components().with_context(|| "")?;
+        let module_main = glob_match
+            .file_name_str()
+            .with_context(|| "Failed to resolve module main file name")?;
+
+        let components = glob_match
+            .components()
+            .with_context(|| "Failed to extract wildcard components from module path")?;
+
         let (name, tags) = get_name_and_tags(&components);
 
         let json_path = ModuleJson::get_path(&module_dir);
