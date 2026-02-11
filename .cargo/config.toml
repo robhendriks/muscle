@@ -1,3 +1,4 @@
 [env]
 RUST_LOG = "trace"
 MUSCLE_ROOT = "/home/rob/Git/devops/infrastructure/azure"
+SCHEMA_BASE_URL = "https://git.robhendriks.dev/rob/muscle/raw/branch/main/schemas"

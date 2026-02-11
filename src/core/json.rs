@@ -84,3 +84,8 @@ pub enum WriteResult {
     Update,
     Ignore,
 }
+
+pub fn get_schema_url(name: &str) -> String {
+    let base_url: &'static str = env!("SCHEMA_BASE_URL");
+    [base_url, name].join("/")
+}

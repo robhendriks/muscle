@@ -2,9 +2,6 @@ use std::path::{Path, PathBuf};
 
 use serde::{Deserialize, Serialize};
 
-pub const SCHEMA_URL: &str =
-    "https://git.robhendriks.dev/rob/muscle/raw/branch/main/schemas/module.json";
-
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct ModuleJson {

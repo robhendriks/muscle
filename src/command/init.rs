@@ -3,9 +3,9 @@ use std::path::Path;
 use crate::{
     cli::Cli,
     core::{
-        json::JsonContainer,
-        module::{self, ModuleJson},
-        project::{self, ProjectJson},
+        json::{self, JsonContainer},
+        module::ModuleJson,
+        project::ProjectJson,
     },
     util,
 };
@@ -39,7 +39,7 @@ async fn init_project(root: &Path, args: &InitArgs) -> anyhow::Result<()> {
     let json_c = JsonContainer::from(
         &json_path,
         ProjectJson {
-            schema: project::SCHEMA_URL.to_string(),
+            schema: json::get_schema_url("project.json"),
         },
     );
 
@@ -75,7 +75,7 @@ async fn init_modules(root: &Path, args: &InitArgs) -> anyhow::Result<()> {
         let json_c = JsonContainer::from(
             &json_path,
             ModuleJson {
-                schema: module::SCHEMA_URL.to_string(),
+                schema: json::get_schema_url("module.json"),
                 name,
                 description: String::from(""),
                 authors: vec![args.author.to_string()],
