@@ -1,10 +1,8 @@
 use std::path::{Path, PathBuf};
 
-use clap::Args;
-use clap::builder::Str;
-use muscle_core::{json::JsonContainer, module::ModuleJson, project::ProjectJson};
-
 use crate::cli::Cli;
+use clap::Args;
+use muscle_core::{json::JsonContainer, module, module::ModuleJson, project, project::ProjectJson};
 
 #[derive(Debug, Args)]
 pub struct InitArgs {
@@ -30,7 +28,12 @@ impl InitArgs {
 
 async fn init_project(root: &Path, args: &InitArgs) -> anyhow::Result<()> {
     let json_path = ProjectJson::get_path(root);
-    let json_c = JsonContainer::from(&json_path, ProjectJson {});
+    let json_c = JsonContainer::from(
+        &json_path,
+        ProjectJson {
+            schema: project::SCHEMA_URL.to_string(),
+        },
+    );
 
     let result = json_c.write_safe(args.force).await?;
 
@@ -51,6 +54,7 @@ async fn init_modules(root: &Path, args: &InitArgs) -> anyhow::Result<()> {
         let json_c = JsonContainer::from(
             &json_path,
             ModuleJson {
+                schema: module::SCHEMA_URL.to_string(),
                 name: String::from(""),
                 description: String::from(""),
                 authors: vec![args.author.to_string()],
