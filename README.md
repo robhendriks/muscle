@@ -1,10 +1,10 @@
 # Muscle
 
-A lightweight CLI for managing Bicep monorepos on Azure.
+A lightweight CLI for managing Bicep monorepos.
 
 ## What it does
 
-Muscle helps you organize, build, and publish Bicep modules in a monorepo structure. Less ceremony, more infrastructure.
+Muscle helps you organize, build, and publish Bicep modules in a monorepo structure.
 
 ## Installation
 
