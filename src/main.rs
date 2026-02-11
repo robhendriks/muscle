@@ -4,6 +4,7 @@ use crate::cli::Cli;
 
 mod cli;
 mod command;
+mod core;
 mod util;
 
 #[tokio::main]

@@ -1,9 +1,16 @@
 use std::path::Path;
 
-use crate::{cli::Cli, util};
+use crate::{
+    cli::Cli,
+    core::{
+        json::JsonContainer,
+        module::{self, ModuleJson},
+        project::{self, ProjectJson},
+    },
+    util,
+};
 use anyhow::Context;
 use clap::Args;
-use muscle_core::{json::JsonContainer, module, module::ModuleJson, project, project::ProjectJson};
 
 #[derive(Debug, Args)]
 pub struct InitArgs {

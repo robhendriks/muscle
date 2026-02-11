@@ -9,6 +9,7 @@ pub struct JsonContainer<T> {
 }
 
 impl<T> JsonContainer<T> {
+    #[allow(unused)]
     pub fn new(path: impl AsRef<Path>) -> Self {
         Self {
             path: path.as_ref().to_path_buf(),
@@ -25,6 +26,7 @@ impl<T> JsonContainer<T> {
 }
 
 impl<T: DeserializeOwned> JsonContainer<T> {
+    #[allow(unused)]
     pub async fn read(&mut self) -> anyhow::Result<()> {
         let path = &self.path;
 
