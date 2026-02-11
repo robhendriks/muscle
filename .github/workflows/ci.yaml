@@ -44,7 +44,7 @@ jobs:
         run: cargo build --release
 
       - name: Upload binary
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v3
         with:
           name: ${{ matrix.artifact_name }}
           path: target/release/${{ matrix.binary_name }}
