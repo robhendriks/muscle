@@ -32,8 +32,9 @@ impl Glob {
 
     fn get_regex(&self) -> &Regex {
         self.regex.get_or_init(|| {
-            let regex_pattern = format!("^{}$", self.pattern.replace("**", "(.+?)"));
-            Regex::new(&regex_pattern).unwrap()
+            let pattern = self.pattern.replace("**", "(.+?)");
+            let pattern = format!("^{}$", pattern);
+            Regex::new(&pattern).unwrap()
         })
     }
 }
