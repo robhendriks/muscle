@@ -15,10 +15,10 @@ jobs:
         include:
           - os: ubuntu-latest
             artifact_name: linux-x64
-            binary_name: bicepx
+            binary_name: muscle
           - os: windows-latest
             artifact_name: windows-x64
-            binary_name: bicepx.exe
+            binary_name: muscle.exe
 
     concurrency:
       group: ci-${{ matrix.os }}
