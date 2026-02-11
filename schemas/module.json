@@ -13,7 +13,8 @@
     "authors": {
       "type": "array",
       "items": {
-        "type": "string"
+        "type": "string",
+        "minLength": 1
       },
       "minItems": 1,
       "uniqueItems": true
@@ -29,7 +30,8 @@
     "tags": {
       "type": "array",
       "items": {
-        "type": "string"
+        "type": "string",
+        "minLength": 1
       },
       "uniqueItems": true
     }
@@ -40,5 +42,6 @@
     "authors",
     "version",
     "main"
-  ]
+  ],
+  "additionalProperties": false
 }
