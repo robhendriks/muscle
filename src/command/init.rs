@@ -4,8 +4,8 @@ use crate::{
     cli::Cli,
     core::{
         json::{self, JsonContainer},
-        module::ModuleJson,
-        project::ProjectJson,
+        module_config::ModuleCfg,
+        project_config::ProjectCfg,
     },
     util,
 };
@@ -14,8 +14,8 @@ use clap::Args;
 
 #[derive(Debug, Args)]
 pub struct InitArgs {
-    #[arg(short, long, default_value = "**/main.bicep")]
-    glob: String,
+    #[arg(long)]
+    include_modules: Option<String>,
 
     #[arg(short, long, default_value_t = false)]
     force: bool,
@@ -35,25 +35,30 @@ impl InitArgs {
 }
 
 async fn init_project(root: &Path, args: &InitArgs) -> anyhow::Result<()> {
-    let json_path = ProjectJson::get_path(root);
-    let json_c = JsonContainer::from(
-        &json_path,
-        ProjectJson {
+    let cfg_path = ProjectCfg::get_path(root);
+    let cfg_container = JsonContainer::from(
+        &cfg_path,
+        ProjectCfg {
             schema: json::get_schema_url("project.json"),
         },
     );
 
-    let result = json_c.write_safe(args.force).await?;
+    let result = cfg_container.write_safe(args.force).await?;
 
-    log::info!("[{:?}] {}", result, json_path.display());
+    log::info!("[{:?}] {}", result, cfg_path.display());
     Ok(())
 }
 
 async fn init_modules(root: &Path, args: &InitArgs) -> anyhow::Result<()> {
-    let pattern = root.join(&args.glob);
+    let Some(include_modules) = &args.include_modules else {
+        log::debug!("Skipping modules");
+        return Ok(());
+    };
+
+    let pattern = root.join(include_modules);
     let pattern_str = pattern.to_str().unwrap();
 
-    let glob = util::Glob::new(pattern_str);
+    let glob = util::fs::Glob::new(pattern_str);
     let glob_matches = glob.matches()?;
 
     for glob_match in glob_matches {
@@ -71,10 +76,10 @@ async fn init_modules(root: &Path, args: &InitArgs) -> anyhow::Result<()> {
 
         let (name, tags) = get_name_and_tags(&components);
 
-        let json_path = ModuleJson::get_path(module_dir);
-        let json_c = JsonContainer::from(
-            &json_path,
-            ModuleJson {
+        let cfg_path = ModuleCfg::get_path(module_dir);
+        let cfg_container = JsonContainer::from(
+            &cfg_path,
+            ModuleCfg {
                 schema: json::get_schema_url("module.json"),
                 name,
                 description: String::from(""),
@@ -85,9 +90,9 @@ async fn init_modules(root: &Path, args: &InitArgs) -> anyhow::Result<()> {
             },
         );
 
-        let result = json_c.write_safe(args.force).await?;
+        let result = cfg_container.write_safe(args.force).await?;
 
-        log::info!("[{:?}] {}", result, json_path.display());
+        log::info!("[{:?}] {}", result, cfg_path.display());
     }
 
     Ok(())

@@ -3,6 +3,7 @@ use std::path::{Path, PathBuf};
 use anyhow::{Context, anyhow};
 use serde::{Serialize, de::DeserializeOwned};
 
+#[derive(Debug)]
 pub struct JsonContainer<T> {
     pub path: PathBuf,
     pub data: Option<T>,

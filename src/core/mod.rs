@@ -1,3 +1,4 @@
+pub mod domain;
 pub mod json;
-pub mod module;
-pub mod project;
+pub mod module_config;
+pub mod project_config;

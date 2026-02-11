@@ -4,20 +4,14 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct ModuleJson {
+pub struct ProjectCfg {
     #[serde(rename = "$schema")]
     pub schema: String,
-    pub name: String,
-    pub description: String,
-    pub authors: Vec<String>,
-    pub version: String,
-    pub main: String,
-    pub tags: Vec<String>,
 }
 
-impl ModuleJson {
+impl ProjectCfg {
     pub fn get_path(path: impl AsRef<Path>) -> PathBuf {
-        static FILE: &str = "module.json";
+        static FILE: &str = "muscle.json";
         path.as_ref().join(FILE)
     }
 }
