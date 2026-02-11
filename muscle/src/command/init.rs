@@ -1,8 +1,8 @@
-use std::path::{Path, PathBuf};
+use std::path::Path;
 
 use crate::{cli::Cli, util};
 use anyhow::Context;
-use clap::{Args, builder::Str};
+use clap::Args;
 use muscle_core::{json::JsonContainer, module, module::ModuleJson, project, project::ProjectJson};
 
 #[derive(Debug, Args)]
