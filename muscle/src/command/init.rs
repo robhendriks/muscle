@@ -1,8 +1,8 @@
 use std::path::{Path, PathBuf};
 
-use crate::cli::Cli;
-use crate::util::wildcard::extract_wildcard_components;
-use clap::Args;
+use crate::{cli::Cli, util};
+use anyhow::Context;
+use clap::{Args, builder::Str};
 use muscle_core::{json::JsonContainer, module, module::ModuleJson, project, project::ProjectJson};
 
 #[derive(Debug, Args)]
@@ -43,19 +43,20 @@ async fn init_project(root: &Path, args: &InitArgs) -> anyhow::Result<()> {
 }
 
 async fn init_modules(root: &Path, args: &InitArgs) -> anyhow::Result<()> {
-    let module_discover_path = root.join(&args.glob);
-    let module_discover_str = module_discover_path.to_str().unwrap();
+    let pattern = root.join(&args.glob);
+    let pattern_str = pattern.to_str().unwrap();
 
-    let module_paths = discover_modules(module_discover_str)?;
+    let glob = util::Glob::new(&pattern_str);
+    let glob_matches = glob.matches()?;
 
-    for (module_path, module_main) in module_paths {
-        let module_main_file_name = module_main.file_name().unwrap();
-        let module_main_relative = module_main.strip_prefix(&root)?;
+    for glob_match in glob_matches {
+        let module_dir = glob_match.parent().with_context(|| "")?;
+        let module_main = glob_match.file_name_str().with_context(|| "")?;
 
-        let (name, tags) = get_name_and_tags(&args.glob, module_main_relative)
-            .unwrap_or_else(|| (String::from(""), Vec::new()));
+        let components = glob_match.components().with_context(|| "")?;
+        let (name, tags) = get_name_and_tags(&components);
 
-        let json_path = ModuleJson::get_path(&module_path);
+        let json_path = ModuleJson::get_path(&module_dir);
         let json_c = JsonContainer::from(
             &json_path,
             ModuleJson {
@@ -64,7 +65,7 @@ async fn init_modules(root: &Path, args: &InitArgs) -> anyhow::Result<()> {
                 description: String::from(""),
                 authors: vec![args.author.to_string()],
                 version: args.version.to_string(),
-                main: String::from(module_main_file_name.to_str().unwrap()),
+                main: module_main.to_string(),
                 tags,
             },
         );
@@ -77,10 +78,7 @@ async fn init_modules(root: &Path, args: &InitArgs) -> anyhow::Result<()> {
     Ok(())
 }
 
-fn get_name_and_tags(glob: &str, path: &Path) -> Option<(String, Vec<String>)> {
-    let path = path.to_str().unwrap();
-    let components = extract_wildcard_components(glob, path)?;
-
+fn get_name_and_tags(components: &Vec<String>) -> (String, Vec<String>) {
     let name: String = components
         .last()
         .map_or_else(|| String::from(""), |s| s.to_owned());
@@ -92,19 +90,5 @@ fn get_name_and_tags(glob: &str, path: &Path) -> Option<(String, Vec<String>)> {
         .map(|s| s.to_string())
         .collect();
 
-    Some((name, categories))
-}
-
-fn discover_modules(pattern: &str) -> anyhow::Result<Vec<(PathBuf, PathBuf)>> {
-    let mut results: Vec<(PathBuf, PathBuf)> = Vec::new();
-
-    for entry in glob::glob(pattern)? {
-        if let Ok(module_path) = entry {
-            if let Some(module_parent) = module_path.parent() {
-                results.push((module_parent.to_path_buf(), module_path));
-            }
-        }
-    }
-
-    Ok(results)
+    (name, categories)
 }

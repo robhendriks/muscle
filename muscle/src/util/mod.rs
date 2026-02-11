@@ -1,1 +1,60 @@
-pub mod wildcard;
+use std::path::{Path, PathBuf};
+
+use regex::Regex;
+
+pub struct Glob {
+    pattern: String,
+}
+
+impl Glob {
+    pub fn new(pattern: &str) -> Self {
+        Self {
+            pattern: pattern.to_string(),
+        }
+    }
+
+    pub fn matches<'gl>(&'gl self) -> anyhow::Result<Vec<GlobMatch<'gl>>> {
+        let mut matches: Vec<GlobMatch<'gl>> = Vec::new();
+
+        for entry in glob::glob(&self.pattern)? {
+            if let Ok(path) = entry {
+                matches.push(GlobMatch { glob: &self, path });
+            }
+        }
+
+        Ok(matches)
+    }
+}
+
+pub struct GlobMatch<'gl> {
+    glob: &'gl Glob,
+    pub path: PathBuf,
+}
+
+impl<'gl> GlobMatch<'gl> {
+    pub fn file_name_str(&self) -> Option<&str> {
+        self.path.file_name()?.to_str()
+    }
+
+    pub fn parent(&self) -> Option<&Path> {
+        self.path.parent()
+    }
+
+    pub fn components(&'gl self) -> Option<Vec<String>> {
+        let pattern = &self.glob.pattern;
+
+        let regex_pattern = format!("^{}$", pattern.replace("**", "(.+?)"));
+        let re = Regex::new(&regex_pattern).ok()?;
+
+        let captures = re.captures(&self.path.to_str()?)?;
+        let components: Vec<String> = captures
+            .iter()
+            .skip(1)
+            .filter_map(|m| m)
+            .flat_map(|m| m.as_str().split('/'))
+            .map(|s| s.to_string())
+            .collect();
+
+        (!components.is_empty()).then_some(components)
+    }
+}
