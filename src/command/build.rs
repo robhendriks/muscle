@@ -1,6 +1,6 @@
 use clap::Args;
 
-use crate::{az::bicep::BicepRpcClient, cli::Cli, core::domain};
+use crate::{az::bicep_rpc::BicepJsonRpcClient, cli::Cli, core::domain, json_rpc::JsonRpcServer};
 
 #[derive(Debug, Args)]
 pub struct BuildArgs {}
@@ -12,21 +12,21 @@ impl BuildArgs {
         project.init().await?;
         project.discover_modules().await?;
 
-        let mut rpc_client = BicepRpcClient::new();
-        rpc_client.start().await?;
+        let server = JsonRpcServer::bind("127.0.0.1:1337").await?;
+        log::debug!("JSON RPC server listening on port {}", server.port());
+
+        let connection = server.accept().await?;
+        let mut client = BicepJsonRpcClient::from(connection);
+
+        let version = client.version().await?;
+        log::debug!("Using Bicep version {}", version);
 
         for module in &project.modules {
-            let build_file = module.main_file();
-            // let build_result = BicepClient::build(&build_file).await;
+            let format_file = module.main_file().to_str().unwrap();
+            let format_result = client.format(format_file).await?;
+            println!("{}", format_result);
 
-            // match build_result {
-            //     Ok(_) => {
-            //         println!("OK");
-            //     }
-            //     Err(_) => {
-            //         println!("FAIL");
-            //     }
-            // }
+            // TODO: replace format with build!
         }
 
         Ok(())
