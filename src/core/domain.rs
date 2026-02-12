@@ -67,6 +67,7 @@ pub struct Module {
     pub path: PathBuf,
     pub cfg: JsonContainer<ModuleCfg>,
     main: OnceCell<PathBuf>,
+    files: Vec<PathBuf>,
 }
 
 impl Module {
@@ -75,11 +76,13 @@ impl Module {
             path: path.as_ref().to_path_buf(),
             cfg: JsonContainer::new(ModuleCfg::get_path(path)),
             main: OnceCell::new(),
+            files: Vec::new(),
         }
     }
 
     pub async fn init(&mut self) -> anyhow::Result<()> {
-        self.cfg.read().await
+        self.cfg.read().await?;
+        self.discover_files()
     }
 
     pub fn to_view(&self, parent: &Project) -> ModuleView<'_> {
@@ -94,6 +97,7 @@ impl Module {
             main: &cfg.main,
             tags: &cfg.tags,
             path,
+            files: &self.files,
         }
     }
 
@@ -102,6 +106,17 @@ impl Module {
             let main_file = &self.get_cfg().main;
             self.path.join(main_file)
         })
+    }
+
+    fn discover_files(&mut self) -> anyhow::Result<()> {
+        let pattern = self.path.join("**/*.bicep");
+
+        for file in glob::glob(pattern.to_str().unwrap())?.flatten() {
+            let file_rel = file.strip_prefix(&self.path).unwrap();
+            self.files.push(file_rel.to_path_buf());
+        }
+
+        Ok(())
     }
 
     fn get_cfg(&self) -> &ModuleCfg {
@@ -118,4 +133,5 @@ pub struct ModuleView<'m> {
     pub main: &'m str,
     pub tags: &'m [String],
     pub path: &'m Path,
+    pub files: &'m [PathBuf],
 }
