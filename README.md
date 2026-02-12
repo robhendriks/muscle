@@ -2,12 +2,30 @@
 
 A lightweight CLI for managing Bicep monorepos.
 
+> [!CAUTION]
+> This is a work in progress.
+
 > [!IMPORTANT]
 > Requires a local installation of [Azure CLI](https://learn.microsoft.com/en-us/azure/azure-resource-manager/bicep/install#azure-cli) and [Bicep](https://learn.microsoft.com/en-us/azure/azure-resource-manager/bicep/install).
 
 ## What it does
 
 Muscle helps you organize, build, and publish Bicep modules in a monorepo structure.
+
+### Features
+
+#### ⚡ High Performance
+  - Built in Rust
+  - Utilizes Bicep JSON RPC to speed up tasks (compilation/formatting)
+
+#### 📜 JSON Output
+
+- Commands emit JSON that can be piped into tools like [jq](https://jqlang.org/)
+
+### Roadmap
+
+1. Implement formatting, publishing, and version management
+2. Add documentation generation based on compilation results
 
 ## Installation
 
