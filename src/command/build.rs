@@ -1,6 +1,11 @@
 use clap::Args;
 
-use crate::{az::bicep_rpc::BicepJsonRpcClient, cli::Cli, core::domain, json_rpc::JsonRpcServer};
+use crate::{
+    az::{bicep_cli, bicep_rpc::BicepJsonRpcClient},
+    cli::Cli,
+    core::domain,
+    json_rpc::JsonRpcServer,
+};
 
 #[derive(Debug, Args)]
 pub struct BuildArgs {}
@@ -12,21 +17,27 @@ impl BuildArgs {
         project.init().await?;
         project.discover_modules().await?;
 
-        let server = JsonRpcServer::bind("127.0.0.1:1337").await?;
-        log::debug!("JSON RPC server listening on port {}", server.port());
+        let server = JsonRpcServer::bind("127.0.0.1:0").await?;
+        log::debug!("Starting JSON RPC socket on port {}", server.port());
+
+        log::debug!("Connecting Bicep JSON RPC to socket");
+        let _bicep_process = bicep_cli::json_rpc(server.port()).await?;
 
         let connection = server.accept().await?;
         let mut client = BicepJsonRpcClient::from(connection);
 
         let version = client.version().await?;
-        log::debug!("Using Bicep version {}", version);
+        log::debug!("Using Bicep CLI version {}", version);
 
         for module in &project.modules {
-            let format_file = module.main_file().to_str().unwrap();
-            let format_result = client.format(format_file).await?;
-            println!("{}", format_result);
+            let compile_file = module.main_file().to_str().unwrap();
+            log::info!("Compiling {}", compile_file);
 
-            // TODO: replace format with build!
+            let compile_result = client.compile(compile_file).await?;
+            let compile_output_file = module.path.join("main.json");
+
+            // Write to output
+            tokio::fs::write(compile_output_file, compile_result.as_bytes()).await?;
         }
 
         Ok(())

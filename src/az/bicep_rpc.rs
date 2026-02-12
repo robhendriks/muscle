@@ -29,6 +29,24 @@ impl BicepJsonRpcClient {
         Ok(contents.into())
     }
 
+    pub async fn compile(&mut self, path: &str) -> anyhow::Result<String> {
+        // log::debug!("[COMPILE] {}", path);
+
+        let params = json!({
+            "path": path
+        });
+
+        let result = self.req("bicep/compile", params).await?;
+
+        // log::debug!("{:?}", result);
+
+        // TODO: handle compilation errors
+
+        let contents = result["contents"].as_str().unwrap_or("");
+
+        Ok(contents.into())
+    }
+
     async fn req(&mut self, method: &str, params: Value) -> anyhow::Result<Value> {
         let response = self.connection.send(method, params).await?;
 
