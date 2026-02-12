@@ -6,7 +6,7 @@ pub struct HealthArgs {}
 
 impl HealthArgs {
     pub async fn execute(&self, _cli: &Cli) -> anyhow::Result<()> {
-        print_binary_health("-");
+        print_binary_health("az");
         print_binary_health("bicep");
 
         Ok(())
