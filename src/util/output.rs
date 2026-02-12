@@ -1,23 +1,26 @@
-use clap::Args;
+use clap::{Args, ValueEnum};
 use serde::Serialize;
 
 #[derive(Debug, Args)]
 pub struct OutputArgs {
-    #[arg(short, long, default_value_t = false)]
-    pretty: bool,
+    #[arg(short, long, default_value = "json")]
+    output_type: OutputType,
 }
 
-pub fn write_json<T>(data: T, args: &OutputArgs) -> anyhow::Result<()>
+#[derive(Debug, Clone, ValueEnum, Eq, PartialEq)]
+pub enum OutputType {
+    Json,
+}
+
+pub fn write<T>(data: T, args: &OutputArgs) -> anyhow::Result<()>
 where
     T: Serialize,
 {
-    let to_str_fn = if args.pretty {
-        serde_json::to_string_pretty::<T>
-    } else {
-        serde_json::to_string::<T>
+    // TODO: support other output types
+    let str = match args.output_type {
+        OutputType::Json => serde_json::to_string::<T>(&data)?,
     };
 
-    let str = to_str_fn(&data)?;
     println!("{}", str);
 
     Ok(())

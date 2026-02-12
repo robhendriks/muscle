@@ -61,7 +61,7 @@ impl ModuleArgs {
                 Ok(())
             }
             ModuleCommands::List(args) => {
-                util::output::write_json(project.modules_as_json(&project), &args.output)?;
+                util::output::write(project.module_views(&project), &args.output)?;
                 Ok(())
             }
             ModuleCommands::Show(args) => {
@@ -69,7 +69,7 @@ impl ModuleArgs {
 
                 match module {
                     Some(module) => {
-                        util::output::write_json(module.to_json(&project), &args.output)?;
+                        util::output::write(module.to_view(&project), &args.output)?;
                         Ok(())
                     }
                     None => Err(anyhow!("Module '{}' not found", args.name)),
