@@ -1,7 +1,10 @@
 use clap::Args;
 
 use crate::{
-    az::{bicep_cli, bicep_rpc::BicepJsonRpcClient},
+    az::{
+        bicep_cli,
+        bicep_rpc::{BicepCompileResult, BicepJsonRpcClient},
+    },
     cli::Cli,
     core::domain,
     json_rpc::JsonRpcServer,
@@ -45,8 +48,24 @@ impl BuildArgs {
             let compile_result = client.compile(main_file.to_str().unwrap()).await?;
             let compile_output_file = module.path.join("main.json");
 
-            // Write to output
-            tokio::fs::write(compile_output_file, compile_result.as_bytes()).await?;
+            match compile_result {
+                BicepCompileResult::Ok(contents) => {
+                    tokio::fs::write(compile_output_file, contents.as_bytes()).await?;
+                }
+                BicepCompileResult::Error(errs) => {
+                    for err in errs {
+                        simplelog::info!(
+                            "<u>{}</> <b>{}</> {} <d>{}</>",
+                            err.code,
+                            err.level,
+                            err.message,
+                            err.source
+                        );
+                    }
+
+                    simplelog::error!("Error");
+                }
+            };
         }
 
         Ok(())
