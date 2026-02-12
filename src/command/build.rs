@@ -36,7 +36,7 @@ impl BuildArgs {
             let main_file_rel = main_file.strip_prefix(&cli.root).unwrap();
 
             simplelog::info!(
-                "<b>Compiling</> <d>[{}/{}]</> {}",
+                "<d>[{}/{}]</> <b>Compiling:</> {}",
                 i + 1,
                 c,
                 main_file_rel.display()
