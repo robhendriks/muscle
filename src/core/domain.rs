@@ -42,7 +42,7 @@ impl Project {
                     self.modules.push(module);
                 }
                 Err(_) => {
-                    log::warn!("Failed to init module {}", module_entry.display());
+                    simplelog::warn!("Failed to init module {}", module_entry.display());
                 }
             }
         }

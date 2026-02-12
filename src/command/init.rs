@@ -45,13 +45,13 @@ async fn init_project(root: &Path, args: &InitArgs) -> anyhow::Result<()> {
 
     let result = cfg_container.write_safe(args.force).await?;
 
-    log::info!("[{:?}] {}", result, cfg_path.display());
+    simplelog::info!("[{:?}] {}", result, cfg_path.display());
     Ok(())
 }
 
 async fn init_modules(root: &Path, args: &InitArgs) -> anyhow::Result<()> {
     let Some(include_modules) = &args.include_modules else {
-        log::debug!("Skipping modules");
+        simplelog::debug!("Skipping modules");
         return Ok(());
     };
 
@@ -92,7 +92,7 @@ async fn init_modules(root: &Path, args: &InitArgs) -> anyhow::Result<()> {
 
         let result = cfg_container.write_safe(args.force).await?;
 
-        log::info!("[{:?}] {}", result, cfg_path.display());
+        simplelog::info!("[{:?}] {}", result, cfg_path.display());
     }
 
     Ok(())

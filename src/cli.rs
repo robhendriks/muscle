@@ -2,7 +2,7 @@ use std::path::PathBuf;
 
 use clap::{Parser, Subcommand};
 
-use crate::command::{build::BuildArgs, init::InitArgs, module::ModuleArgs};
+use crate::command::{build::BuildArgs, health::HealthArgs, init::InitArgs, module::ModuleArgs};
 
 #[derive(Debug, Parser)]
 pub struct Cli {
@@ -19,6 +19,7 @@ impl Cli {
             Commands::Build(args) => args.execute(self).await,
             Commands::Init(args) => args.execute(self).await,
             Commands::Module(args) => args.execute(self).await,
+            Commands::Health(args) => args.execute(self).await,
         }
     }
 }
@@ -33,4 +34,7 @@ enum Commands {
 
     #[command(alias = "mod")]
     Module(ModuleArgs),
+
+    #[command(alias = "h")]
+    Health(HealthArgs),
 }

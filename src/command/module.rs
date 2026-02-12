@@ -56,7 +56,7 @@ impl ModuleArgs {
 
                 let result = cfg_container.write_safe(args.force).await?;
 
-                log::info!("[{:?}] {}", result, cfg_path.display());
+                simplelog::info!("[{:?}] {}", result, cfg_path.display());
 
                 Ok(())
             }

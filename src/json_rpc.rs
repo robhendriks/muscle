@@ -61,7 +61,7 @@ impl JsonRpcConnection {
     }
 
     pub async fn send(&mut self, method: &str, params: Value) -> anyhow::Result<JsonRpcResponse> {
-        log::debug!("[RPC_SEND] {}", method);
+        simplelog::debug!("[RPC_SEND] {}", method);
 
         let req = JsonRpcRequest {
             jsonrpc: "2.0",
@@ -105,7 +105,7 @@ impl JsonRpcConnection {
             }
         }
 
-        log::debug!("[RPC_RECV] {} bytes", content_length);
+        simplelog::debug!("[RPC_RECV] {} bytes", content_length);
 
         // Read exact content length
         let mut body = vec![0u8; content_length];

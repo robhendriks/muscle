@@ -18,20 +18,20 @@ impl BuildArgs {
         project.discover_modules().await?;
 
         let server = JsonRpcServer::bind("127.0.0.1:0").await?;
-        log::debug!("Starting JSON RPC socket on port {}", server.port());
+        simplelog::debug!("Starting JSON RPC socket on port {}", server.port());
 
-        log::debug!("Connecting Bicep JSON RPC to socket");
+        simplelog::debug!("Connecting Bicep JSON RPC to socket");
         let _bicep_process = bicep_cli::json_rpc(server.port()).await?;
 
         let connection = server.accept().await?;
         let mut client = BicepJsonRpcClient::from(connection);
 
         let version = client.version().await?;
-        log::debug!("Using Bicep CLI version {}", version);
+        simplelog::debug!("Using Bicep CLI version {}", version);
 
         for module in &project.modules {
             let compile_file = module.main_file().to_str().unwrap();
-            log::info!("Compiling {}", compile_file);
+            simplelog::info!("Compiling {}", compile_file);
 
             let compile_result = client.compile(compile_file).await?;
             let compile_output_file = module.path.join("main.json");

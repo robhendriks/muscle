@@ -10,10 +10,10 @@ path = "src/main.rs"
 [dependencies]
 anyhow = "1.0.101"
 clap = { version = "4.5.58", features = ["env", "derive"] }
-env_logger = "0.11.9"
 glob = "0.3.3"
-log = "0.4.29"
 regex = "1.12.3"
 serde = { version = "1.0.228", features = ["derive"] }
 serde_json = "1.0.149"
+simplelog = { version = "0.12.2", features = ["paris"] }
 tokio = { version = "1.49.0", features = ["full"] }
+which = "8.0.0"
