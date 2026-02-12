@@ -71,9 +71,7 @@ pub struct Response {
 }
 
 impl Response {
-    pub async fn decode<R: AsyncReadExt + Unpin>(
-        reader: &mut BufReader<R>,
-    ) -> anyhow::Result<Response> {
+    pub async fn decode(reader: &mut BufReader<OwnedReadHalf>) -> anyhow::Result<Response> {
         let mut content_length: usize = 0;
         let mut header_line = String::new();
 
