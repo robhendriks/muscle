@@ -1,5 +1,7 @@
 use clap::Parser;
-use simplelog::{ColorChoice, CombinedLogger, Config, LevelFilter, TermLogger, TerminalMode};
+use simplelog::{
+    ColorChoice, CombinedLogger, ConfigBuilder, LevelFilter, TermLogger, TerminalMode,
+};
 
 use crate::cli::Cli;
 
@@ -12,19 +14,28 @@ mod util;
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
-    logger_init();
-
     let cli = Cli::parse();
+
+    logger_init(cli.debug);
 
     cli.execute().await
 }
 
-fn logger_init() {
-    CombinedLogger::init(vec![TermLogger::new(
-        LevelFilter::Debug,
-        Config::default(),
+fn logger_init(debug: bool) {
+    let log_level = if debug {
+        LevelFilter::Debug
+    } else {
+        LevelFilter::Info
+    };
+
+    let logger = TermLogger::new(
+        log_level,
+        ConfigBuilder::new()
+            .set_time_level(LevelFilter::Off)
+            .build(),
         TerminalMode::Mixed,
         ColorChoice::Always,
-    )])
-    .unwrap();
+    );
+
+    CombinedLogger::init(vec![logger]).unwrap();
 }

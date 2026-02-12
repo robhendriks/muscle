@@ -6,8 +6,16 @@ use crate::command::{build::BuildArgs, health::HealthArgs, init::InitArgs, modul
 
 #[derive(Debug, Parser)]
 pub struct Cli {
-    #[arg(short, long, env = "MUSCLE_ROOT", default_value = ".")]
+    #[arg(long = "root", env = "MUSCLE_ROOT", global = true, default_value = ".")]
     pub root: PathBuf,
+
+    #[arg(
+        long = "debug",
+        env = "MUSCLE_DEBUG",
+        global = true,
+        default_value_t = false
+    )]
+    pub debug: bool,
 
     #[command(subcommand)]
     command: Commands,
