@@ -6,6 +6,7 @@ mod az;
 mod cli;
 mod command;
 mod core;
+mod json_rpc;
 mod util;
 
 #[tokio::main]

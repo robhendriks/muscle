@@ -57,8 +57,8 @@ impl Project {
         })
     }
 
-    pub fn modules_as_json(&self, parent: &Project) -> Vec<ModuleJson<'_>> {
-        self.modules.iter().map(|m| m.to_json(parent)).collect()
+    pub fn module_views(&self, parent: &Project) -> Vec<ModuleView<'_>> {
+        self.modules.iter().map(|m| m.to_view(parent)).collect()
     }
 }
 
@@ -82,11 +82,11 @@ impl Module {
         self.cfg.read().await
     }
 
-    pub fn to_json(&self, parent: &Project) -> ModuleJson<'_> {
+    pub fn to_view(&self, parent: &Project) -> ModuleView<'_> {
         let path = self.path.strip_prefix(&parent.path).unwrap();
 
         let cfg = self.get_cfg();
-        ModuleJson {
+        ModuleView {
             name: &cfg.name,
             description: &cfg.description,
             version: &cfg.version,
@@ -110,7 +110,7 @@ impl Module {
 }
 
 #[derive(Debug, Serialize)]
-pub struct ModuleJson<'m> {
+pub struct ModuleView<'m> {
     pub name: &'m str,
     pub description: &'m str,
     pub authors: &'m [String],

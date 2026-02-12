@@ -32,8 +32,8 @@ impl ModuleArgs {
 
                 match module {
                     Some(module) => {
-                        let main_file = module.main_file();
-                        log::info!("[BUILD] {}", main_file.display());
+                        let _main_file = module.main_file();
+                        // TODO: BicepClient::build(&main_file).await
                         Ok(())
                     }
                     None => Err(anyhow!("Module '{}' not found", args.name)),
@@ -61,7 +61,7 @@ impl ModuleArgs {
                 Ok(())
             }
             ModuleCommands::List(args) => {
-                util::output::write_json(project.modules_as_json(&project), &args.output)?;
+                util::output::write(project.module_views(&project), &args.output)?;
                 Ok(())
             }
             ModuleCommands::Show(args) => {
@@ -69,7 +69,7 @@ impl ModuleArgs {
 
                 match module {
                     Some(module) => {
-                        util::output::write_json(module.to_json(&project), &args.output)?;
+                        util::output::write(module.to_view(&project), &args.output)?;
                         Ok(())
                     }
                     None => Err(anyhow!("Module '{}' not found", args.name)),
@@ -82,22 +82,22 @@ impl ModuleArgs {
 #[derive(Debug, Subcommand)]
 enum ModuleCommands {
     #[command(alias = "b")]
-    Build(BuildArgs),
+    Build(ModuleBuildArgs),
     #[command(alias = "i")]
-    Init(InitArgs),
+    Init(ModuleInitArgs),
     #[command(alias = "s")]
-    Show(ShowArgs),
+    Show(ModuleShowArgs),
     #[command(alias = "ls")]
-    List(ListArgs),
+    List(ModuleListArgs),
 }
 
 #[derive(Debug, Args)]
-struct BuildArgs {
+struct ModuleBuildArgs {
     name: String,
 }
 
 #[derive(Debug, Args)]
-struct InitArgs {
+struct ModuleInitArgs {
     name: String,
 
     #[arg(short, long, default_value = ".")]
@@ -117,7 +117,7 @@ struct InitArgs {
 }
 
 #[derive(Debug, Args)]
-struct ShowArgs {
+struct ModuleShowArgs {
     name: String,
 
     #[command(flatten)]
@@ -125,7 +125,7 @@ struct ShowArgs {
 }
 
 #[derive(Debug, Args)]
-struct ListArgs {
+struct ModuleListArgs {
     #[command(flatten)]
     output: OutputArgs,
 }

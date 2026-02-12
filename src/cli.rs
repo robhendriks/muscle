@@ -2,7 +2,7 @@ use std::path::PathBuf;
 
 use clap::{Parser, Subcommand};
 
-use crate::command::{init::InitArgs, module::ModuleArgs};
+use crate::command::{build::BuildArgs, init::InitArgs, module::ModuleArgs};
 
 #[derive(Debug, Parser)]
 pub struct Cli {
@@ -16,6 +16,7 @@ pub struct Cli {
 impl Cli {
     pub async fn execute(&self) -> anyhow::Result<()> {
         match &self.command {
+            Commands::Build(args) => args.execute(self).await,
             Commands::Init(args) => args.execute(self).await,
             Commands::Module(args) => args.execute(self).await,
         }
@@ -24,6 +25,9 @@ impl Cli {
 
 #[derive(Debug, Subcommand)]
 enum Commands {
+    #[command(alias = "b")]
+    Build(BuildArgs),
+
     #[command(alias = "i")]
     Init(InitArgs),
 

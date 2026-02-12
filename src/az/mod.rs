@@ -1,2 +1,1 @@
-#[allow(unused)]
-pub struct BicepClient {}
+pub mod bicep_rpc;
