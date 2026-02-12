@@ -1,4 +1,4 @@
-use anyhow::{Ok, anyhow};
+use anyhow::{Context, Ok, anyhow};
 use serde_json::{Value, json};
 
 use crate::json_rpc::JsonRpcConnection;
@@ -14,7 +14,7 @@ impl BicepJsonRpcClient {
 
     pub async fn version(&mut self) -> anyhow::Result<String> {
         let result = self.req("bicep/version", json!({})).await?;
-        let version_string = result["version"].as_str().unwrap();
+        let version_string = result["version"].as_str().with_context(|| "No content")?;
         Ok(version_string.into())
     }
 
@@ -24,7 +24,7 @@ impl BicepJsonRpcClient {
         });
 
         let result = self.req("bicep/format", params).await?;
-        let contents = result["contents"].as_str().unwrap();
+        let contents = result["contents"].as_str().with_context(|| "No content")?;
 
         Ok(contents.into())
     }
@@ -35,7 +35,7 @@ impl BicepJsonRpcClient {
         });
 
         let result = self.req("bicep/compile", params).await?;
-        let contents = result["contents"].as_str().unwrap_or("");
+        let contents = result["contents"].as_str().with_context(|| "No content")?;
 
         Ok(contents.into())
     }
